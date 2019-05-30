@@ -29,11 +29,20 @@ $instance_name_prefix = "core"
 $enable_serial_logging = false
 $share_home = false
 $vm_gui = false
-$vm_memory = 1024
+$vm_memory = 4096
 $vm_cpus = 1
 $vb_cpuexecutioncap = 100
-$shared_folders = {}
-$forwarded_ports = {}
+$shared_folders = {
+  "../share" => "/home/core/share"
+}
+$forwarded_ports = {
+  80   => 80,
+  81   => 81,
+  8025 => 8025,
+  443  => 443,
+  3306 => 3306,
+  3000  => 3000
+}
 
 # Attempt to apply the deprecated environment variable NUM_INSTANCES to
 # $num_instances while allowing config.rb to override it
@@ -158,6 +167,7 @@ Vagrant.configure("2") do |config|
         config.vm.provision :shell, inline: "mkdir -p /var/lib/coreos-vagrant", :privileged => true
         config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/", :privileged => true
       end
+      config.vm.provision :shell, path: "bootstrap.sh"
 
       config.vm.provider :virtualbox do |vb|
         config.ignition.hostname = vm_name
